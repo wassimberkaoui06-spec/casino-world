@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Casino World - Free Social Games</title>
+<style>
+  :root {
+    --gold: #f3dc8f;
+    --gold-dark: #b8921f;
+    --red: #c9161c;
+    --red-hover: #e8503c;
+    --bg-dark: #040605;
+    --card-bg: #0d1411;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-dark);
+    color: var(--gold);
+    font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+  .app-container {
+    width: 100%;
+    max-width: 440px;
+    background: var(--card-bg);
+    border: 2px solid var(--gold-dark);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+  }
+  .screen { display: none; padding: 20px 15px; text-align: center; background-size: cover; background-position: center; }
+  .screen.active { display: block; }
+
+  /* Universal Buttons */
+  .btn-red {
+    width: 100%;
+    padding: 14px;
+    border: 0;
+    border-radius: 6px;
+    background: linear-gradient(180deg, var(--red-hover) 0%, var(--red) 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 15px;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-gold {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    background: rgba(13, 20, 17, 0.95);
+    color: var(--gold);
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 10px;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 4px 15px rgba(184, 146, 31, 0.2);
+  }
+
+  /* Game Selector Grid Overlay */
+  .selector-box {
+    background: rgba(0,0,0,0.4);
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+  .game-card {
+    background: rgba(18, 24, 21, 0.85);
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .game-card.selected { border-color: var(--gold); background: rgba(31, 43, 35, 0.95); box-shadow: 0 0 10px var(--gold-dark); }
+  .game-card img { width: 100%; height: 85px; object-fit: cover; border-radius: 6px; }
+  .game-card h4 { margin-top: 6px; font-size: 13px; color: #fff; }
+
+  /* Timer Box */
+  .timer-box {
+    background: rgba(8, 12, 10, 0.85);
+    border: 1px solid var(--gold-dark);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+  }
+  .timer-digits { font-size: 26px; font-weight: bold; color: var(--gold); letter-spacing: 2px; margin: 5px 0; }
+
+  /* Common Footer Component */
+  .footer-legal {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(243, 220, 143, 0.25);
+    text-align: center;
+    font-size: 11px;
+    color: #a0a5a2;
+    line-height: 1.4;
+  }
+  .footer-legal a { color: var(--gold); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SCREEN 1: AGE VERIFICATION -->
+  <div id="screenAge" class="screen active">
+    <img src="img/main-bg.jpg" alt="Casino World" style="width:100%; border-radius:8px; margin-bottom:15px; max-height:220px; object-fit:cover;">
+    <h2 style="color:var(--gold); font-size:20px; margin-bottom:10px;">Play 2 Games for Free!</h2>
+    <p style="font-size:13px; color:#ccc; margin-bottom:15px;">You can play two games for free, provided you are 18 years old or older.</p>
+    <label style="font-size:12px; display:block; text-align:left; margin-bottom:5px;">Enter your age:</label>
+    <input type="number" id="ageInput" placeholder="Your age" style="width:100%; padding:12px; background:#121815; border:1px solid var(--gold-dark); border-radius:6px; color:#fff; text-align:center; font-size:16px; margin-bottom:15px;">
+    <button class="btn-red" onclick="verifyAge()">CONTINUE</button>
+
+    <!-- Footer in Screen 1 -->
+    <div class="footer-legal">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px;">
+        <span style="border: 1px solid var(--gold); border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; font-size: 9px;">18+</span>
+        <span style="color: #ccc;">Gambling can be addictive. Please play responsibly.</span>
+      </div>
+      <p>Free games use demo credits with no cash value.</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: GAME SELECTOR (Uses select-grid.jpg as Background) -->
+  <div id="screenSelect" class="screen" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)), url('img/select-grid.jpg');">
+    <div class="selector-box">
+      <h3 style="color:var(--gold); font-size:18px;">Choose your 2 free games</h3>
+      <p style="font-size:12px; color:#aaa; margin-bottom:10px;">Pick two. Each starts with 1000 demo credits.</p>
+      
+      <div class="grid">
+        <div class="game-card" onclick="toggleGame(this, 'Dragon Slots', 'slots-game.jpg')">
+          <img src="img/select-grid.jpg" style="object-position: top left;" alt="Dragon Slots">
+          <h4>Dragon Slots</h4>
+        </div>
+        <div class="game-card" onclick="toggleGame(this, 'Royal Roulette', 'roulette-game.jpg')">
+          <img src="img/select-grid.jpg" style="object-position: top right;" alt="Royal Roulette">
+          <h4>Royal Roulette</h4>
+        </div>
+        <div class="game-card" onclick="toggleGame(this, 'Blackjack 21', 'blackjack-game.jpg')">
+          <img src="img/select-grid.jpg" style="object-position: bottom left;" alt="Blackjack 21">
+          <h4>Blackjack 21</h4>
+        </div>
+        <div class="game-card" onclick="toggleGame(this, 'Dragon Dice', 'dice-game.jpg')">
+          <img src="img/select-grid.jpg" style="object-position: bottom right;" alt="Dragon Dice">
+          <h4>Dragon Dice</h4>
+        </div>
+      </div>
+      <button id="btnStart" class="btn-red" disabled onclick="startGames()">START FREE GAMES (0/2)</button>
+    </div>
+
+    <!-- Common Footer with Real Money Conversion -->
+    <div class="footer-legal">
+      <p style="font-size:12px; color:#fff; margin-bottom:6px; font-weight:bold;">Ready for the real thing?</p>
+      <!--  # -->
+      <a href="https://www.example.com/" target="_blank" class="btn-gold">PLAY FOR REAL MONEY ↗</a>
+      
+      <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0 6px 0;">
+        <span style="border: 1px solid var(--gold); border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; font-size: 9px;">18+</span>
+        <span style="color: #ccc;">Gambling can be addictive. Please play responsibly.</span>
+      </div>
+      <p>Free games use demo credits with no cash value and cannot be withdrawn or exchanged.</p>
+      <p>Need support? Visit <a href="https://www.begambleaware.org" target="_blank">BeGambleAware.org</a> or call 1-800-GAMBLER.</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: GAMEPLAY STAGE (Dynamic Background per Game) -->
+  <div id="screenGame" class="screen">
+    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:10px; background:rgba(8, 12, 10, 0.9); padding:10px; border-radius:6px; border: 1px solid var(--gold-dark);">
+      <span>BALANCE: <strong id="balance">1,000 DEMO</strong></span>
+      <span>SPINS LEFT: <strong id="spins" style="color:var(--red);">5</strong></span>
+    </div>
+    <h3 id="gameTitle" style="color:var(--gold); margin-bottom:10px; text-shadow: 0 2px 4px #000;">Game</h3>
+    
+    <div id="gameStage" style="background: rgba(0,0,0,0.6); border:1px solid var(--gold); border-radius:8px; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:15px; margin-bottom: 15px;">
+      <div id="gameMsg" style="font-size:20px; font-weight:bold; color:#fff; text-shadow:0 2px 4px #000;">Press SPIN to Play!</div>
+    </div>
+    
+    <button id="btnSpin" class="btn-red" onclick="playTurn()">SPIN / ROLL</button>
+
+    <!-- Common Footer in Gameplay -->
+    <div class="footer-legal">
+      <p style="font-size:12px; color:#fff; margin-bottom:6px; font-weight:bold;">Ready for the real thing?</p>
+      <a href="#" target="_blank" class="btn-gold">PLAY FOR REAL MONEY ↗</a>
+      <p style="margin-top:8px;">18+ only. Play responsibly.</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: FINAL LOCK SCREEN (lock-bg.jpg) -->
+  <div id="screenLock" class="screen" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('img/lock-bg.jpg');">
+    <div style="font-size:24px; margin-bottom:5px;">⏱️</div>
+    <h2 style="color:var(--gold); font-size:22px; margin:8px 0;">FREE PLAY COMPLETE</h2>
+    <p style="font-size:12px; color:#ccc; margin-bottom:12px;">You've played your 2 free games. Come back in 24 hours to play 2 more free games.</p>
+    
+    <div class="timer-box">
+      <div style="font-size:10px; color:#888; text-transform:uppercase;">Next Free Games in</div>
+      <div class="timer-digits" id="countdownTimer">23:59:59</div>
+      <div style="font-size:10px; color:#aaa;">Available again tomorrow</div>
+    </div>
+
+    <p style="font-size:11px; color:#aaa; line-height:1.3; margin-bottom:12px;">
+      Taking regular breaks is part of playing responsibly. Gaming should always be entertainment, never a way to make money.
+    </p>
+
+    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:12px 0;">
+
+    <p style="font-size:12px; color:#fff; margin-bottom:5px;">Prefer to keep playing with real money?</p>
+    
+    <a href="#" target="_blank" class="btn-gold">PLAY FOR REAL MONEY ↗</a>
+    
+    <div class="footer-legal">
+      <p style="font-size:10px; color:#777; line-height:1.2;">
+        18+ only. Real-money play involves financial risk. Set a budget and time limit, and never gamble more than you can afford to lose.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let selectedGames = [];
+  let currentGameIdx = 0;
+  let spinsLeft = 5;
+  let balance = 1000;
+
+  function verifyAge() {
+    const age = document.getElementById('ageInput').value;
+    if (age >= 18) {
+      showScreen('screenSelect');
+    } else {
+      alert('You must be 18 or older to play.');
+    }
+  }
+
+  function toggleGame(card, name, bgImg) {
+    const existing = selectedGames.find(g => g.name === name);
+    if (existing) {
+      card.classList.remove('selected');
+      selectedGames = selectedGames.filter(g => g.name !== name);
+    } else {
+      if (selectedGames.length < 2) {
+        card.classList.add('selected');
+        selectedGames.push({ name, bgImg });
+      }
+    }
+    const btn = document.getElementById('btnStart');
+    btn.textContent = `START FREE GAMES (${selectedGames.length}/2)`;
+    btn.disabled = selectedGames.length !== 2;
+  }
+
+  function startGames() {
+    currentGameIdx = 0;
+    loadGameStage();
+  }
+
+  function loadGameStage() {
+    spinsLeft = 5;
+    const currentGame = selectedGames[currentGameIdx];
+    document.getElementById('spins').textContent = spinsLeft;
+    document.getElementById('balance').textContent = balance.toLocaleString() + ' DEMO';
+    document.getElementById('gameTitle').textContent = currentGame.name;
+    document.getElementById('gameMsg').textContent = 'Press SPIN to Play!';
+    
+    // Set background image dynamically for current game
+    const gameScreen = document.getElementById('screenGame');
+    gameScreen.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)), url('img/${currentGame.bgImg}')`;
+    
+    showScreen('screenGame');
+  }
+
+  function playTurn() {
+    if (spinsLeft <= 0) return;
+    spinsLeft--;
+    let win = Math.floor(Math.random() * 180);
+    balance += win;
+    document.getElementById('balance').textContent = balance.toLocaleString() + ' DEMO';
+    document.getElementById('spins').textContent = spinsLeft;
+    
+    const msg = document.getElementById('gameMsg');
+    if (win > 0) {
+      msg.textContent = `YOU WON +$${win}!`;
+      msg.style.color = '#52d681';
+    } else {
+      msg.textContent = 'NO WIN - TRY AGAIN!';
+      msg.style.color = '#ff6a5e';
+    }
+
+    if (spinsLeft === 0) {
+      setTimeout(() => {
+        if (currentGameIdx < 1) {
+          currentGameIdx++;
+          alert(`Next Game: ${selectedGames[1].name}`);
+          loadGameStage();
+        } else {
+          showScreen('screenLock');
+          startTimer();
+        }
+      }, 1200);
+    }
+  }
+
+  function startTimer() {
+    let totalSeconds = 24 * 3600 - 1;
+    const timerElem = document.getElementById('countdownTimer');
+    setInterval(() => {
+      let hrs = Math.floor(totalSeconds / 3600);
+      let mins = Math.floor((totalSeconds % 3600) / 60);
+      let secs = totalSeconds % 60;
+      timerElem.textContent = 
+        `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      if (totalSeconds > 0) totalSeconds--;
+    }, 1000);
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>
